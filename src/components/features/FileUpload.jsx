@@ -5,19 +5,33 @@ import { UploadCloud, FileText, X, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
+import { extractTextFromPDF } from '@/services/pdf'
+
 export default function FileUpload({ onFileUpload }) {
   const [file, setFile] = useState(null)
   const [error, setError] = useState(null)
+  const [isParsing, setIsParsing] = useState(false)
 
-  const onDrop = useCallback((acceptedFiles, fileRejections) => {
+  const onDrop = useCallback(async (acceptedFiles, fileRejections) => {
     setError(null)
     if (fileRejections.length > 0) {
       setError('Please upload a valid PDF file under 5MB.')
       return
     }
     if (acceptedFiles.length > 0) {
-      setFile(acceptedFiles[0])
-      onFileUpload && onFileUpload(acceptedFiles[0])
+      const uploadedFile = acceptedFiles[0]
+      setFile(uploadedFile)
+      setIsParsing(true)
+      
+      try {
+        const text = await extractTextFromPDF(uploadedFile)
+        onFileUpload && onFileUpload(uploadedFile, text)
+        setIsParsing(false)
+      } catch (err) {
+        setError(err.message)
+        setIsParsing(false)
+        setFile(null)
+      }
     }
   }, [onFileUpload])
 
@@ -113,19 +127,28 @@ export default function FileUpload({ onFileUpload }) {
                   </div>
                 </div>
                 {/* Progress bar placeholder - can be real later */}
-                <div className="h-1 w-full bg-muted">
-                  <motion.div
-                    className="h-full bg-primary"
-                    initial={{ width: "0%" }}
-                    animate={{ width: "100%" }}
-                    transition={{ duration: 0.5 }}
-                  />
+                <div className="h-1 w-full bg-muted overflow-hidden rounded-full">
+                  {isParsing ? (
+                    <motion.div
+                      className="h-full bg-primary"
+                      initial={{ width: "0%" }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-green-500" />
+                  )}
                 </div>
              </div>
              
              <div className="mt-6 flex justify-center">
-                <Button size="lg" className="w-full sm:w-auto min-w-[200px]" onClick={() => console.log('Analyze')}>
-                  Analyze Resume
+                <Button 
+                  size="lg" 
+                  className="w-full sm:w-auto min-w-[200px]" 
+                  onClick={() => console.log('Analyze')}
+                  disabled={isParsing}
+                >
+                  {isParsing ? 'Parsing PDF...' : 'Analyze Resume'}
                 </Button>
              </div>
           </motion.div>

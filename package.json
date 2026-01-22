@@ -13,6 +13,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.28.1",
     "lucide-react": "^0.562.0",
+    "pdfjs-dist": "^5.4.530",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-dropzone": "^14.3.8",
