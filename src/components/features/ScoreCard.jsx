@@ -15,7 +15,14 @@ export default function ScoreCard({ score, label, className }) {
 
   return (
     <div className={cn("relative flex flex-col items-center justify-center p-6 bg-card rounded-xl border shadow-sm", className)}>
-      <div className="relative w-32 h-32">
+      <div 
+        className="relative w-32 h-32" 
+        role="progressbar" 
+        aria-valuenow={score} 
+        aria-valuemin="0" 
+        aria-valuemax="100"
+        aria-label={`${label}: ${score} out of 100`}
+      >
         <svg className="w-full h-full transform -rotate-90">
           <circle
             cx="64"
