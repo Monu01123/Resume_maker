@@ -3,16 +3,26 @@ import SkillGapList from '@/components/features/SkillGapList'
 import KeywordCloud from '@/components/features/KeywordCloud'
 import ExperienceTimeline from '@/components/features/ExperienceTimeline'
 
+import { saveAnalysis } from '@/services/history'
+
 export default function Dashboard() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { resumeText, fileName } = location.state || {}
+  const { resumeText, fileName, existingResult } = location.state || {}
 
   const [status, setStatus] = useState('Initializing...')
   const [progress, setProgress] = useState(0)
   const [result, setResult] = useState(null)
 
   useEffect(() => {
+    // If we have an existing result (from History), use it directly
+    if (existingResult) {
+      setResult(existingResult)
+      setProgress(100)
+      return
+    }
+
+    // Otherwise, require resumeText
     if (!resumeText) {
       navigate('/')
       return
@@ -25,6 +35,8 @@ export default function Dashboard() {
           setProgress(step.progress)
         })
         setResult(data)
+        // Auto-save to history
+        saveAnalysis(data)
       } catch (error) {
         console.error("Analysis failed", error)
         setStatus("Analysis failed")
@@ -32,7 +44,7 @@ export default function Dashboard() {
     }
 
     analyze()
-  }, [resumeText, navigate])
+  }, [resumeText, existingResult, navigate])
 
   if (!result) {
     return (
