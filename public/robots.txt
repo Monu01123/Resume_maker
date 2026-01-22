@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://resume-intel.vercel.app/sitemap.xml

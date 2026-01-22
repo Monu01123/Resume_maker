@@ -1,61 +1,110 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const MOCK_ANALYSIS = {
-  score: 82,
-  summary: "A strong Senior Frontend Engineer resume with excellent focus on React and Modern UI. Good quantification of achievements, though some backend skills listed could be more specific.",
-  roleMatch: "Senior Frontend Engineer",
-  skills: [
-    { name: "React", category: "Frontend", level: "Expert" },
-    { name: "JavaScript", category: "Frontend", level: "Expert" },
-    { name: "Tailwind CSS", category: "Frontend", level: "Advanced" },
-    { name: "Node.js", category: "Backend", level: "Intermediate" },
-    { name: "Git", category: "Tools", level: "Advanced" }
-  ],
-  experience: [
-    { role: "Senior Frontend Engineer", company: "Tech Corp", duration: "2023 - Present", impact: "High", description: "Led migration to Next.js, improved Core Web Vitals by 40%." },
-    { role: "Frontend Developer", company: "Startup Inc", duration: "2020 - 2023", impact: "Medium", description: "Built design system from scratch using Tailwind CSS." }
-  ],
-  gaps: [
-    { skill: "Testing Strategy", suggestion: "Mention Jest/Cypress or E2E testing experience explicitly." },
-    { skill: "System Design", suggestion: "Add examples of architectural decisions or scale handling." },
-    { skill: "Performance", suggestion: "Quantify performance improvements (e.g., 'Reduced LCP by 2s')." }
-  ],
-  keywords: {
-    found: ["React", "Redux", "Vite", "Responsive", "Accessibility", "REST API"],
-    missing: ["CI/CD", "Docker", "AWS", "GraphQL", "Next.js"]
-  }
-}
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 /**
- * Simulates an AI analysis request with streaming-like delay.
+ * Real AI analysis using Gemini 1.5 Flash.
  * @param {string} resumeText - The extracted text from the resume.
+ * @param {string} [role] - Target role
+ * @param {string} [experienceLevel] - Experience level
  * @returns {Promise<Object>}
  */
-export async function analyzeResume(resumeText) {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Return mock data
-  return MOCK_ANALYSIS;
+export async function analyzeResume(resumeText, role = "General", experienceLevel = "Mid-Level") {
+  try {
+    // Using the latest available model found for this key
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+    const prompt = `
+      Act as an expert Resume Analyzer and Career Coach. 
+      Analyze the following resume text against the target role of "${role}" at a "${experienceLevel}" level.
+      
+      Return a JSON object ONLY, with this exact schema:
+      {
+        "score": number (0-100),
+        "summary": "string (executive summary, max 2 sentences)",
+        "roleMatch": "string",
+        "skills": [ { "name": "string", "category": "string", "level": "Beginner" | "Intermediate" | "Advanced" | "Expert" } ],
+        "experience": [ { "role": "string", "company": "string", "duration": "string", "description": "string (summary)", "impact": "High" | "Medium" | "Low" } ],
+        "gaps": [ { "skill": "string", "suggestion": "string" } ],
+        "keywords": {
+          "found": ["string", "string"],
+          "missing": ["string", "string"]
+        }
+      }
+
+      RESUME TEXT:
+      ${resumeText.slice(0, 10000)} // Truncate to safety limit if needed
+    `;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Clean markdown code blocks if present
+    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(cleanJson);
+
+  } catch (error) {
+    console.error("Gemini Analysis Failed:", error);
+    // Fallback to mock data on error (or re-throw if preferred)
+    return generateMockData(role, experienceLevel);
+  }
 }
 
 /**
- * Simulates a streaming AI response.
- * @param {string} resumeText 
- * @param {function} onChunk - Callback for each chunk of data
+ * Simulates streaming progress while calling the real API.
  */
-export async function streamAnalyzeResume(resumeText, onChunk) {
+export async function streamAnalyzeResume(resumeText, onChunk, role, experienceLevel) {
   const steps = [
-    { status: 'Analyzing structure...', progress: 10 },
-    { status: 'Extracting skills...', progress: 30 },
-    { status: 'Comparing with industry standards...', progress: 60 },
-    { status: 'Generating insights...', progress: 85 },
-    { status: 'Finalizing report...', progress: 100 }
+    { status: 'Initializing AI model...', progress: 10 },
+    { status: `Analyzing for ${role}...`, progress: 30 },
+    { status: 'Extracting skills and gaps...', progress: 60 },
+    { status: 'Finalizing insights...', progress: 85 }
   ];
 
-  for (const step of steps) {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    onChunk(step);
-  }
+  // Start the 'fake' progress updates
+  let currentStep = 0;
+  const progressInterval = setInterval(() => {
+    if (currentStep < steps.length) {
+      onChunk(steps[currentStep]);
+      currentStep++;
+    }
+  }, 1000); // Update every second
 
-  return MOCK_ANALYSIS;
+  try {
+    // Call Real AI
+    const data = await analyzeResume(resumeText, role, experienceLevel);
+    
+    // Once done, clear interval and finish
+    clearInterval(progressInterval);
+    onChunk({ status: 'Analysis Complete!', progress: 100 });
+    
+    return data;
+  } catch (err) {
+    clearInterval(progressInterval);
+    throw err;
+  }
+}
+
+function generateMockData(role, experienceLevel) {
+  // Keep mock generator as fallback
+   const isSenior = experienceLevel?.includes("Senior") || experienceLevel?.includes("Staff");
+   return {
+    score: isSenior ? 85 : 78,
+    summary: `(Fallback Mode) A strong ${experienceLevel} ${role} resume. The AI service was unavailable, so this is a simulation.`,
+    roleMatch: role,
+    skills: [
+      { name: "React", category: "Frontend", level: "Expert" },
+      { name: "JavaScript", category: "Frontend", level: "Advanced" },
+    ],
+    experience: [],
+    gaps: [
+      { skill: "AI Integration", suggestion: "Check API Keys." }
+    ],
+    keywords: {
+      found: ["React"],
+      missing: ["Gemini"]
+    }
+  }
 }

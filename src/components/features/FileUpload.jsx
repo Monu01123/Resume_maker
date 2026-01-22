@@ -60,32 +60,28 @@ export default function FileUpload({ onFileUpload }) {
             <div
               {...getRootProps()}
               className={cn(
-                "relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-xl cursor-pointer transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300 ease-in-out focus-visible:outline-none",
                 isDragActive
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/50 hover:bg-muted/50",
-                error && "border-destructive/50 bg-destructive/5"
+                  ? "border-primary bg-primary/5 scale-[1.02] shadow-lg"
+                  : "border-border/60 hover:border-primary/50 hover:bg-muted/30 hover:scale-[1.01]"
               )}
             >
               <input {...getInputProps()} aria-label="Upload Resume PDF" />
-              <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center space-y-2">
+              <div className="flex flex-col items-center justify-center pt-2 pb-3 text-center space-y-3">
                 <div className={cn(
-                  "p-4 rounded-full transition-colors",
-                  isDragActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                  "p-3 rounded-full transition-colors duration-300",
+                  isDragActive ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground group-hover:text-primary"
                 )}>
                   <UploadCloud className="w-8 h-8" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-lg font-semibold">
-                    {isDragActive ? "Drop your resume here" : "Upload your resume"}
+                  <p className="text-base font-semibold text-foreground">
+                    {isDragActive ? "Drop it like it's hot!" : "Click to upload or drag & drop"}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Drag & drop or click to browse
+                    Supported Format: PDF (Max 5MB)
                   </p>
                 </div>
-                <p className="text-xs text-muted-foreground mt-4">
-                  PDF up to 5MB
-                </p>
               </div>
             </div>
             {error && (
@@ -106,31 +102,31 @@ export default function FileUpload({ onFileUpload }) {
             key="file-preview"
             className="w-full"
           >
-             <div className="relative overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm">
-                <div className="p-6 flex items-center gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <FileText className="w-6 h-6" />
+             <div className="relative overflow-hidden rounded-xl border border-border/50 bg-background/50 backdrop-blur-sm shadow-sm">
+                <div className="p-5 flex items-center gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
+                    <FileText className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
+                    <p className="text-sm font-medium truncate text-foreground">
                       {file.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                      {(file.size / 1024 / 1024).toFixed(2)} MB • Ready to analyze
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                     <CheckCircle className="w-5 h-5 text-green-500" />
-                     <Button variant="ghost" size="icon" onClick={removeFile} aria-label="Remove file">
+                  <div className="flex items-center gap-1">
+                     <CheckCircle className="w-5 h-5 text-green-500 animate-in zoom-in" />
+                     <Button variant="ghost" size="icon" onClick={removeFile} aria-label="Remove file" className="hover:bg-destructive/10 hover:text-destructive transition-colors">
                        <X className="w-4 h-4" />
                      </Button>
                   </div>
                 </div>
                 {/* Progress bar placeholder - can be real later */}
-                <div className="h-1 w-full bg-muted overflow-hidden rounded-full">
+                <div className="h-1 w-full bg-muted overflow-hidden">
                   {isParsing ? (
                     <motion.div
-                      className="h-full bg-primary"
+                      className="h-full bg-gradient-to-r from-primary to-purple-500"
                       initial={{ width: "0%" }}
                       animate={{ width: "100%" }}
                       transition={{ duration: 1.5, repeat: Infinity }}
