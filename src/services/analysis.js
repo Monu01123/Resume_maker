@@ -10,6 +10,10 @@ const MOCK_ANALYSIS = {
     { name: "Node.js", category: "Backend", level: "Intermediate" },
     { name: "Git", category: "Tools", level: "Advanced" }
   ],
+  experience: [
+    { role: "Senior Frontend Engineer", company: "Tech Corp", duration: "2023 - Present", impact: "High", description: "Led migration to Next.js, improved Core Web Vitals by 40%." },
+    { role: "Frontend Developer", company: "Startup Inc", duration: "2020 - 2023", impact: "Medium", description: "Built design system from scratch using Tailwind CSS." }
+  ],
   gaps: [
     { skill: "Testing Strategy", suggestion: "Mention Jest/Cypress or E2E testing experience explicitly." },
     { skill: "System Design", suggestion: "Add examples of architectural decisions or scale handling." },
