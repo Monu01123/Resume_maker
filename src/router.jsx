@@ -5,6 +5,7 @@ import MainLayout from '@/layout/MainLayout'
 const Home = React.lazy(() => import('@/pages/Home'))
 const Dashboard = React.lazy(() => import('@/pages/Dashboard'))
 const History = React.lazy(() => import('@/pages/History'))
+const RoleLandingPage = React.lazy(() => import('@/pages/RoleLandingPage'))
 
 const Loading = () => (
   <div className="flex items-center justify-center min-h-[50vh]">
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
       {
         path: '/history',
         element: <Suspense fallback={<Loading />}><History /></Suspense>,
+      },
+      {
+        path: '/resume-checker/:role',
+        element: <Suspense fallback={<Loading />}><RoleLandingPage /></Suspense>,
       },
     ],
   },

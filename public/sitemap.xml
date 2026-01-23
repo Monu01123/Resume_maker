@@ -2,14 +2,31 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://resume-intel.vercel.app/</loc>
-    <lastmod>2026-01-23</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2024-01-23</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://resume-intel.vercel.app/history</loc>
-    <lastmod>2026-01-23</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://resume-intel.vercel.app/login</loc>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://resume-intel.vercel.app/dashboard</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://resume-intel.vercel.app/resume-checker/software-engineer</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resume-intel.vercel.app/resume-checker/product-manager</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resume-intel.vercel.app/resume-checker/data-scientist</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resume-intel.vercel.app/resume-checker/marketing-manager</loc>
+    <priority>0.7</priority>
   </url>
 </urlset>

@@ -56,10 +56,10 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] text-center space-y-8 py-10">
       <div className="space-y-4 max-w-2xl px-4">
         <h1 className="text-4xl font-bold tracking-tight lg:text-6xl text-gradient">
-          AI Resume Intelligence
+          Free AI Resume Scanner <br /> & Score Checker
         </h1>
         <p className="text-lg text-muted-foreground">
-          Unlock the full potential of your career. Get instant, AI-powered feedback tailored to your specific role and experience level.
+          Unlock the full potential of your career. Use our <strong>free resume score checker</strong> to get instant, AI-powered feedback tailored to your specific role.
         </p>
       </div>
       
@@ -134,16 +134,38 @@ export default function Home() {
             </p>
           </div>
           <div className="space-y-2">
-            <h3 className="text-xl font-semibold">🔍 ATS Optimization</h3>
+            <h3 className="text-xl font-semibold">🔍 ATS Resume Scanner</h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Identify missing keywords and formatting issues that might cause <strong>Applicant Tracking Systems (ATS)</strong> to reject your application.
+              Identify missing keywords and formatting issues. Our <strong>resume scanner</strong> ensures <strong>Applicant Tracking Systems (ATS)</strong> don't reject your application.
             </p>
+          </div>
+        </div>
+
+        {/* Popular Roles Internal Links */}
+        <div className="space-y-6 text-center">
+          <h3 className="text-2xl font-bold">Check Resume Score for Popular Roles</h3>
+          <div className="flex flex-wrap justify-center gap-3">
+            {[
+              { label: 'Software Engineer', path: 'software-engineer' },
+              { label: 'Product Manager', path: 'product-manager' },
+              { label: 'Data Scientist', path: 'data-scientist' },
+              { label: 'Marketing Manager', path: 'marketing-manager' },
+              { label: 'Sales Representative', path: 'sales-representative' },
+            ].map((role) => (
+              <a 
+                key={role.path}
+                href={`/resume-checker/${role.path}`}
+                className="px-4 py-2 rounded-full bg-secondary/50 hover:bg-secondary text-sm transition-colors"
+              >
+                {role.label} Resume Scanner
+              </a>
+            ))}
           </div>
         </div>
 
         {/* How it Works */}
         <div className="text-center space-y-8">
-          <h2 className="text-3xl font-bold">How to Optimize Your Resume in 3 Steps</h2>
+          <h2 className="text-3xl font-bold">How to Check Your Resume Score in 3 Steps</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="p-6 rounded-xl border bg-card/50">
               <div className="text-4xl font-bold text-primary/20 mb-4">01</div>
@@ -169,7 +191,7 @@ export default function Home() {
           <div className="space-y-4">
             <div className="space-y-2">
               <h4 className="font-semibold">Is this Resume Scanner free?</h4>
-              <p className="text-muted-foreground text-sm">Yes, Resume Intelligence is 100% free to use. We use advanced AI to help job seekers improve their chances without paywalls.</p>
+              <p className="text-muted-foreground text-sm">Yes, our <strong>resume score checker</strong> is 100% free. We use advanced AI to help job seekers improve their chances without paywalls.</p>
             </div>
             <div className="space-y-2">
               <h4 className="font-semibold">How improves my ATS Score?</h4>

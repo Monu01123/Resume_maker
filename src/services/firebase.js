@@ -11,10 +11,29 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: 'select_account' });
-googleProvider.setCustomParameters({ prompt: 'select_account' });
+console.log("Initializing Firebase with config:", { ...firebaseConfig, apiKey: '***' });
+
+let app;
+let auth;
+let db;
+let googleProvider;
+
+if (firebaseConfig.apiKey) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
+  } catch (error) {
+    console.error("Firebase Initialization Error:", error);
+  }
+} else {
+  console.warn("⚠️ Firebase API Key missing! App running in limited mode. Auth will not work.");
+  // Mock objects to prevent crash
+  auth = { currentUser: null, onAuthStateChanged: (cb) => cb(null) };
+  db = {};
+  googleProvider = {};
+}
+
+export { auth, db, googleProvider };
