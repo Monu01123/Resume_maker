@@ -98,7 +98,7 @@ Building Resumind was an incredible journey that deepened my understanding of se
 
 ## 📬 Contact
 
-**Your Name**  
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)  
-- GitHub: [Your Profile](https://github.com/yourusername)  
+**Monu Meena**  
+- LinkedIn: [monu-meena](https://linkedin.com/in/monu-meena)  
+- GitHub: [Monu01123](https://github.com/Monu01123)  
 - Live Project: [Resumind](https://resume-maker-pi-seven.vercel.app/)
