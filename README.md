@@ -78,11 +78,9 @@ Follow these instructions to set up the project locally on your machine.
 
 ## 📸 Screenshots
 
-*(Replace the placeholder URLs with actual screenshots of your application)*
-
 | Dashboard | Analysis Results |
 |:---:|:---:|
-| ![Dashboard Placeholder](https://via.placeholder.com/600x400?text=Dashboard+View) | ![Results Placeholder](https://via.placeholder.com/600x400?text=Analysis+Results) |
+| ![Dashboard](./screenshots/dashboard.png) | ![Analysis Results](./screenshots/results.png) |
 
 ## 🧠 What I Learned
 
