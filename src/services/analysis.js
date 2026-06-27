@@ -1,85 +1,73 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+// ─── analysis.js ─────────────────────────────────────────────────────────────
+// The Gemini API key is NO LONGER here.
+// All AI calls go through our secure backend proxy: POST /api/analyze
+// The key lives in Vercel Environment Variables (server-side only).
+// ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Real AI analysis using Gemini 1.5 Flash.
- * @param {string} resumeText - The extracted text from the resume.
- * @param {string} [role] - Target role
+ * Calls the secure backend proxy to run Gemini AI analysis.
+ * The browser never sees the API key.
+ *
+ * @param {string} resumeText - Extracted text from the PDF
+ * @param {string} [role] - Target job role
  * @param {string} [experienceLevel] - Experience level
- * @returns {Promise<Object>}
+ * @returns {Promise<Object>} - Structured analysis result
  */
 export async function analyzeResume(resumeText, role = "General", experienceLevel = "Mid-Level") {
   try {
-    // Using the latest available model found for this key
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        resumeText,
+        role,
+        experienceLevel,
+      }),
+    });
 
-    const prompt = `
-      Act as an expert Resume Analyzer and Career Coach. 
-      Analyze the following resume text against the target role of "${role}" at a "${experienceLevel}" level.
-      
-      Return a JSON object ONLY, with this exact schema:
-      {
-        "score": number (0-100),
-        "summary": "string (executive summary, max 2 sentences)",
-        "roleMatch": "string",
-        "skills": [ { "name": "string", "category": "string", "level": "Beginner" | "Intermediate" | "Advanced" | "Expert" } ],
-        "experience": [ { "role": "string", "company": "string", "duration": "string", "description": "string (summary)", "impact": "High" | "Medium" | "Low" } ],
-        "gaps": [ { "skill": "string", "suggestion": "string" } ],
-        "keywords": {
-          "found": ["string", "string"],
-          "missing": ["string", "string"]
-        }
-      }
+    if (!response.ok) {
+      // The server returned a 4xx/5xx — log it and fall through to mock
+      const errorBody = await response.json().catch(() => ({}));
+      console.error("Backend proxy error:", response.status, errorBody);
+      throw new Error(errorBody.error || `Server returned ${response.status}`);
+    }
 
-      RESUME TEXT:
-      ${resumeText.slice(0, 10000)} // Truncate to safety limit if needed
-    `;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    
-    // Clean markdown code blocks if present
-    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleanJson);
+    const data = await response.json();
+    return data;
 
   } catch (error) {
-    console.error("Gemini Analysis Failed:", error);
-    // Fallback to mock data on error (or re-throw if preferred)
+    console.error("analyzeResume failed:", error.message);
+    // Graceful fallback — keeps the UI functional even if the server is down
     return generateMockData(role, experienceLevel);
   }
 }
 
 /**
  * Simulates streaming progress while calling the real API.
+ * The interval-driven progress updates remain unchanged.
  */
 export async function streamAnalyzeResume(resumeText, onChunk, role, experienceLevel) {
   const steps = [
-    { status: 'Initializing AI model...', progress: 10 },
+    { status: "Initializing AI model...", progress: 10 },
     { status: `Analyzing for ${role}...`, progress: 30 },
-    { status: 'Extracting skills and gaps...', progress: 60 },
-    { status: 'Finalizing insights...', progress: 85 }
+    { status: "Extracting skills and gaps...", progress: 60 },
+    { status: "Finalizing insights...", progress: 85 },
   ];
 
-  // Start the 'fake' progress updates
   let currentStep = 0;
   const progressInterval = setInterval(() => {
     if (currentStep < steps.length) {
       onChunk(steps[currentStep]);
       currentStep++;
     }
-  }, 1000); // Update every second
+  }, 1000);
 
   try {
-    // Call Real AI
     const data = await analyzeResume(resumeText, role, experienceLevel);
-    
-    // Once done, clear interval and finish
     clearInterval(progressInterval);
-    onChunk({ status: 'Analysis Complete!', progress: 100 });
-    
+    onChunk({ status: "Analysis Complete!", progress: 100 });
     return data;
   } catch (err) {
     clearInterval(progressInterval);
@@ -87,10 +75,11 @@ export async function streamAnalyzeResume(resumeText, onChunk, role, experienceL
   }
 }
 
+// ─── Mock fallback (used when backend is unreachable) ────────────────────────
+
 function generateMockData(role, experienceLevel) {
-  // Keep mock generator as fallback
-   const isSenior = experienceLevel?.includes("Senior") || experienceLevel?.includes("Staff");
-   return {
+  const isSenior = experienceLevel?.includes("Senior") || experienceLevel?.includes("Staff");
+  return {
     score: isSenior ? 85 : 78,
     summary: `(Fallback Mode) A strong ${experienceLevel} ${role} resume. The AI service was unavailable, so this is a simulation.`,
     roleMatch: role,
@@ -100,11 +89,11 @@ function generateMockData(role, experienceLevel) {
     ],
     experience: [],
     gaps: [
-      { skill: "AI Integration", suggestion: "Check API Keys." }
+      { skill: "AI Integration", suggestion: "Check API Keys on the server." },
     ],
     keywords: {
       found: ["React"],
-      missing: ["Gemini"]
-    }
-  }
+      missing: ["Gemini"],
+    },
+  };
 }
